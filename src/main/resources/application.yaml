@@ -2,16 +2,18 @@ spring:
   application:
     name: void
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 gemini:
   api:
     key: ${KEY_hackerton}
 
 springdoc:
-  default-consumes-media-type: application/json
-  default-produces-media-type: application/json
+  api-docs:
+    version: openapi_3_0
+    path: /v3/api-docs
   swagger-ui:
     path: /swagger-ui.html
-    disable-swagger-default-url: true
-    display-request-duration: true
-  api-docs:
-    path: /api-docs
+    disable-swagger-default-url: false
