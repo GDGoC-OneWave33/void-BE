@@ -25,6 +25,11 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'    // Redis
 	runtimeOnly 'com.h2database:h2'                                             // 개발용 인메모리 DB
 
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testCompileOnly 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+
 	// === 테스트 ===
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
