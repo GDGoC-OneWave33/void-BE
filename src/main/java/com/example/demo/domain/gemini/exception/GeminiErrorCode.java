@@ -52,7 +52,7 @@ public enum GeminiErrorCode implements BaseCode {
     GEMINI_INVALID_INPUT(
             HttpStatus.BAD_REQUEST,
             "GEMINI-008",
-            "의미있는 고민을 입력해주세요."
+            "조금 더 자세히 이야기해 주세요."
     );
 
     private final HttpStatus httpStatus;
