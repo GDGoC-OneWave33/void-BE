@@ -31,6 +31,7 @@ public class RankingService {
     // 키워드 소각 횟수 증가
     public void incrementKeywordCount(String keyword) {
         if (keyword == null || keyword.isBlank()) return;
+        if (keyword.contains("*")) return;
         String key = getRankingkey();
         redisTemplate.opsForZSet().incrementScore(key, keyword, 1);
     }
