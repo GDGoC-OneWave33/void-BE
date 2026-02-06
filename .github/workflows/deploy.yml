@@ -7,6 +7,8 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      KEY_hackerton: ${{ secrets.KEY_HACKERTON_PROD }} # 운영용 secret
 
     steps:
       # 1️⃣ 코드 체크아웃
