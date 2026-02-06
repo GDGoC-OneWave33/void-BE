@@ -136,7 +136,7 @@ void-BE-main/
 
 ### 아키텍처 패턴
 - **DDD (Domain-Driven Design)**: 도메인별 패키지 분리
-- **Layered Architecture**: Controller → Service → Repository
+- **Layered Architecture**: Controller → Service
 - **Clean Architecture**: core, domain, shared로 명확한 의존성 분리
 
 ---
@@ -691,73 +691,6 @@ git push origin main
 
 ---
 
-## 🤝 기여 방법
-
-이 프로젝트는 **프로덕션 자동 배포 시스템**으로 운영되므로, 기여 시 다음 워크플로우를 따라주세요.
-
-### 기여 워크플로우
-
-1. **Fork & Clone**
-```bash
-# Repository Fork 후
-git clone https://github.com/your-username/void-BE.git
-cd void-BE
-```
-
-2. **브랜치 생성**
-```bash
-# 기능 개발
-git checkout -b feature/add-new-feature
-
-# 버그 수정
-git checkout -b fix/bug-description
-```
-
-3. **로컬에서 빌드 검증**
-```bash
-# CI 실패 방지를 위한 사전 체크
-./gradlew clean build
-./gradlew test
-```
-
-4. **커밋 및 푸시**
-```bash
-git add .
-git commit -m "feat: add new feature"
-git push origin feature/add-new-feature
-```
-
-5. **Pull Request 생성**
-- PR 템플릿 작성
-- CI 자동 실행 대기
-- 빌드 성공 확인
-
-6. **코드 리뷰 및 머지**
-- 리뷰어 승인 후 `main` 브랜치로 머지
-- 자동 배포 파이프라인 트리거
-- 프로덕션 반영 확인
-
-### 커밋 컨벤션
-
-**Conventional Commits** 스타일을 따릅니다:
-
-```
-feat: 새로운 기능 추가
-fix: 버그 수정
-docs: 문서 수정
-style: 코드 포맷팅 (기능 변경 없음)
-refactor: 코드 리팩토링
-test: 테스트 추가/수정
-chore: 빌드 설정, 패키지 등
-```
-
-**예시:**
-```bash
-git commit -m "feat: add emotional keyword filtering"
-git commit -m "fix: resolve Gemini API timeout issue"
-git commit -m "docs: update API documentation"
-```
-
 ### 코드 스타일
 
 - **Java**: [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
@@ -864,5 +797,6 @@ Title: [FEATURE] Add emotion analysis history
 **Made with by Void Team**
 
 </div>
+
 
 
