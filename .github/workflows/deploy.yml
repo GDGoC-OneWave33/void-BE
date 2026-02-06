@@ -23,8 +23,8 @@ jobs:
       # 3️⃣ 빌드 + jar 이름 고정
       - name: Build
         run: |
-          ./gradlew clean build -x test
-          cp build/libs/*.jar build/libs/app.jar
+          ./gradlew clean bootJar -x test
+          cp build/libs/*SNAPSHOT.jar build/libs/app.jar
 
       # 4️⃣ EC2로 jar 전송
       - name: Upload jar to EC2
