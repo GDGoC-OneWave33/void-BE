@@ -16,7 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GeminiController {
 
-    private final GeminiService gptService;
+    private final GeminiService geminiService;
 
     @PostMapping("/ask")
     public ApiResponse<Map<String, Object>> ask(@RequestBody Map<String, String> request) {
@@ -29,7 +29,7 @@ public class GeminiController {
             );
         }
 
-        Map<String, Object> result = gptService.askGemini(userContent);
+        Map<String, Object> result = geminiService.askGemini(userContent);
 
         return ApiResponse.onSuccess(result, SuccessCode.OK);
     }
