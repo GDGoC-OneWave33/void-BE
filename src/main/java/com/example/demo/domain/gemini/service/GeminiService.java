@@ -3,6 +3,7 @@ package com.example.demo.domain.gemini.service;
 import com.example.demo.domain.gemini.dto.GeminiRequest;
 import com.example.demo.domain.gemini.dto.GeminiResponse;
 import com.example.demo.domain.gemini.exception.GeminiErrorCode;
+import com.example.demo.domain.ranking.service.RankingService;
 import com.example.demo.shared.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +17,7 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -27,14 +29,17 @@ public class GeminiService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper;
+    private final RankingService rankingService;
 
     public Map<String, Object> askGemini(String userContent) {
         String cleanKey = apiKey.trim();
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + cleanKey;
 
-        String systemPrompt = "유저의 고민을 듣고 다정하게 위로해줘. 핵심 키워드 3개 정도를 욕설 제외하고 뽑아줘. 갯수에 제한 받기 보다는, 정말 중요하다 생각되는 키워드를 뽑아."
-                + "반드시 JSON 형식으로만 대답해. 형식: {\"keyword\": \"단어\", \"answer\": \"내용\"}";
+        String systemPrompt = "유저의 고민을 듣고 다정하게 위로해줘." +
+                "너무 ai 같지 않게 사람답게 말하고, 유저를 절대 비난해서는 안돼." +
+                "무조건적인 공감과 지지를 보내줘. 핵심 키워드 3개 정도를 욕설 제외하고 뽑아줘. 갯수에 제한 받기 보다는, 정말 중요하다 생각되는 키워드를 뽑아."
+                + "반드시 JSON 형식으로만 대답해. 형식: {\"keyword\": [\"단어1\", \"단어2\", \"단어3\"], \"answer\": \"내용\"}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -52,7 +57,22 @@ public class GeminiService {
 
             try {
                 String cleanedJson = rawContent.replaceAll("(?s)```json|```", "").trim();
-                return objectMapper.readValue(cleanedJson, Map.class);
+                Map<String, Object> result = objectMapper.readValue(cleanedJson, Map.class);
+
+                Object keywordObj = result.get("keyword");
+                if (keywordObj instanceof List) {
+                    List<String> keywords = (List<String>) keywordObj;
+                    for (String kw : keywords) {
+                        rankingService.incrementKeywordCount(kw.trim());
+                    }
+                } else if (keywordObj instanceof String) {
+                    String[] splitKeywords = ((String) keywordObj).split(",");
+                    for (String kw : splitKeywords) {
+                        rankingService.incrementKeywordCount(kw.trim());
+                    }
+                }
+
+                return result;
             } catch (JsonProcessingException e) {
                 throw new CustomException(GeminiErrorCode.GEMINI_PARSE_ERROR);
             }

@@ -2,6 +2,10 @@ spring:
   application:
     name: void
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
 gemini:
   api:
     key: ${KEY_hackerton}
