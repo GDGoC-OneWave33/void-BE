@@ -3,6 +3,9 @@ package com.example.demo.domain.gemini.service;
 import com.example.demo.domain.gemini.dto.GeminiRequest;
 import com.example.demo.domain.gemini.dto.GeminiResponse;
 import com.example.demo.domain.gemini.exception.GeminiErrorCode;
+import com.example.demo.domain.nerfilter.dto.AiResponse;
+import com.example.demo.domain.nerfilter.dto.TextRequest;
+import com.example.demo.domain.nerfilter.service.AiAnalysisService;
 import com.example.demo.domain.ranking.service.RankingService;
 import com.example.demo.shared.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,7 +34,18 @@ public class GeminiService {
     private final ObjectMapper objectMapper;
     private final RankingService rankingService;
 
+    private final AiAnalysisService aiAnalysisService;
+
     public Map<String, Object> askGemini(String userContent) {
+        TextRequest textRequest = new TextRequest(userContent, true);
+        AiResponse aiResponse = aiAnalysisService.getAnalysis(textRequest);
+
+        String filteredContent = aiResponse.getFilteredText();
+        if (filteredContent == null || filteredContent.isBlank()) {
+            throw new CustomException(GeminiErrorCode.GEMINI_NO_CONTENT);
+        }
+
+
         String cleanKey = apiKey.trim();
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + cleanKey;
@@ -51,7 +65,7 @@ public class GeminiService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        GeminiRequest request = GeminiRequest.of(systemPrompt, userContent);
+        GeminiRequest request = GeminiRequest.of(systemPrompt, filteredContent);
         HttpEntity<GeminiRequest> entity = new HttpEntity<>(request, headers);
 
         try {
