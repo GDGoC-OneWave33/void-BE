@@ -327,37 +327,7 @@ cd void-BE
 - 감정 키워드 포함 가능
 ```
 
----
 
-## ⚙️ 설정 가이드
-
-### application.yaml 주요 설정
-
-```yaml
-spring:
-  application:
-    name: void
-  
-  data:
-    redis:
-      host: localhost
-      port: 6379
-
-gemini:
-  api:
-    key: ${KEY_hackerton}
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-```
-
-### Redis 키 구조
-
-- **키워드 카운트**: `keyword:{keyword}` → score (카운트)
-- **데이터 타입**: Sorted Set (ZSet)
-
----
 
 ## 🧪 테스트
 
@@ -411,12 +381,6 @@ curl -X POST https://voidvoid.store/ask \
   -H "Content-Type: application/json" \
   -d '{"text": "테스트 메시지"}'
 ```
-
-### 테스트 커버리지
-
-- **목표 커버리지**: 80% 이상
-- **실행 환경**: GitHub Actions CI
-- **리포트**: Actions Artifacts에서 다운로드 가능
 
 ---
 
@@ -482,42 +446,6 @@ jobs:
     - 배포 완료 알림
 ```
 
-### 자동화 이점
-
-✅ **수동 배포 불필요**: 코드만 푸시하면 자동으로 배포  
-✅ **환경 일관성**: 모든 배포가 동일한 파이프라인 통과  
-✅ **빠른 롤백**: 문제 발생 시 이전 커밋으로 즉시 복구  
-✅ **시크릿 관리**: GitHub Secrets로 안전한 API 키 관리  
-✅ **테스트 자동화**: 모든 PR에 대해 자동 테스트 실행
-
-### 배포 프로세스
-
-1. **개발자가 코드 푸시**
-```bash
-git push origin feature/new-feature
-```
-
-2. **자동 CI 실행**
-- 빌드 및 테스트 자동 실행
-- 실패 시 슬랙/이메일 알림
-
-3. **Pull Request 생성**
-- CI 통과 확인
-- 코드 리뷰
-
-4. **main 브랜치로 머지**
-- 자동 배포 트리거
-- 프로덕션 환경 업데이트
-
-5. **배포 완료**
-- 서비스 중단 없이 배포 (Blue-Green 또는 Rolling Update)
-- 헬스 체크 자동 확인
-
-### 모니터링
-
-- **배포 상태**: GitHub Actions 탭에서 실시간 확인
-- **실패 알림**: 슬랙, 이메일로 즉시 알림
-- **로그 확인**: Actions 로그에서 상세 디버깅 가능
 
 ---
 
@@ -613,43 +541,6 @@ redis-cli -h <redis-host> KEYS keyword:*
 - `application.yaml`에서 Redis 호스트/포트 확인
 - 방화벽 규칙 확인 (6379 포트 개방)
 
----
-
-#### 4. 배포 후 API 응답 없음
-
-**체크리스트:**
-```bash
-# 1. 서버 상태 확인
-curl https://jyhdevstore.store/health
-
-# 2. 로그 확인
-# 프로덕션 서버 접속 후
-tail -f /var/log/void-be/application.log
-
-# 3. 프로세스 확인
-ps aux | grep java
-```
-
-**일반적인 원인:**
-- 포트 충돌 (8080 포트 사용 중)
-- 환경 변수 누락
-- 메모리 부족 (OOM)
-
----
-
-#### 5. GitHub Actions 무한 대기
-
-**증상**: CI 파이프라인이 계속 실행 중
-
-**해결:**
-1. Actions 탭에서 실행 중인 워크플로우 확인
-2. 필요시 수동으로 Cancel
-3. 워크플로우 타임아웃 설정 추가:
-```yaml
-jobs:
-  build:
-    timeout-minutes: 10  # 10분 후 자동 종료
-```
 
 ---
 
@@ -666,21 +557,7 @@ Repository → Actions → 워크플로우 선택 → Logs 다운로드
 journalctl -u void-be.service -f
 ```
 
----
-
-### 긴급 복구
-
-문제 발생 시 이전 버전으로 즉시 롤백:
-
-```bash
-# 1. 이전 커밋으로 되돌리기
-git revert HEAD
-git push origin main
-
-# 2. 자동 재배포 트리거
-# (GitHub Actions가 자동으로 처리)
-```
-
+=
 ---
 
 ## 📊 성능 최적화
@@ -797,6 +674,7 @@ Title: [FEATURE] Add emotion analysis history
 **Made with by Void Team**
 
 </div>
+
 
 
 
