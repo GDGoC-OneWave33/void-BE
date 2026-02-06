@@ -7,8 +7,6 @@ project-root
 │   └── infrastructure # 인프라 관련 핵심 로직 (DB, 외부 API 연동 등)
 │
 ├── domain
-│   ├── user         # User 도메인: 엔티티, 리포지토리, 서비스
-│   ├── order        # Order 도메인: 엔티티, 리포지토리, 서비스
 │   └── ...          # 각 도메인별 패키지 구성 (DDD 기반)
 │
 └── shared
@@ -16,3 +14,4 @@ project-root
     ├── dto          # 공통 DTO 정의
     └── exception    # 공통 예외 처리
 ```
+
