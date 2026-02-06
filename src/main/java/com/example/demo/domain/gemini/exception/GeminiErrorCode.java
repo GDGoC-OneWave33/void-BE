@@ -47,6 +47,12 @@ public enum GeminiErrorCode implements BaseCode {
             HttpStatus.BAD_GATEWAY,
             "GEMINI-007",
             "GEMINI 응답에 아무 내용이 없습니다."
+    ),
+
+    GEMINI_INVALID_INPUT(
+            HttpStatus.BAD_REQUEST,
+            "GEMINI-008",
+            "의미있는 고민을 입력해주세요."
     );
 
     private final HttpStatus httpStatus;
