@@ -3,6 +3,9 @@ package com.example.demo.domain.gemini.service;
 import com.example.demo.domain.gemini.dto.GeminiRequest;
 import com.example.demo.domain.gemini.dto.GeminiResponse;
 import com.example.demo.domain.gemini.exception.GeminiErrorCode;
+import com.example.demo.domain.nerfilter.dto.AiResponse;
+import com.example.demo.domain.nerfilter.dto.TextRequest;
+import com.example.demo.domain.nerfilter.service.AiAnalysisService;
 import com.example.demo.domain.ranking.service.RankingService;
 import com.example.demo.shared.exception.CustomException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,20 +34,38 @@ public class GeminiService {
     private final ObjectMapper objectMapper;
     private final RankingService rankingService;
 
+    private final AiAnalysisService aiAnalysisService;
+
     public Map<String, Object> askGemini(String userContent) {
+        TextRequest textRequest = new TextRequest(userContent, true);
+        AiResponse aiResponse = aiAnalysisService.getAnalysis(textRequest);
+
+        String filteredContent = aiResponse.getFilteredText();
+        if (filteredContent == null || filteredContent.isBlank()) {
+            throw new CustomException(GeminiErrorCode.GEMINI_NO_CONTENT);
+        }
+
+
         String cleanKey = apiKey.trim();
 
         String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + cleanKey;
 
-        String systemPrompt = "유저의 고민을 듣고 다정하게 위로해줘." +
-                "너무 ai 같지 않게 사람답게 말하고, 유저를 절대 비난해서는 안돼." +
-                "무조건적인 공감과 지지를 보내줘. 핵심 키워드 3개 정도를 욕설 제외하고 뽑아줘. 갯수에 제한 받기 보다는, 정말 중요하다 생각되는 키워드를 뽑아."
-                + "반드시 JSON 형식으로만 대답해. 형식: {\"keyword\": [\"단어1\", \"단어2\", \"단어3\"], \"answer\": \"내용\"}";
+        String systemPrompt = "너는 유저의 고민을 듣고 위로해주는 상담사야. " +
+                "먼저 유저의 입력이 위로가 필요한 상황인지 판단해. " +
+                "거부해야 할 입력: 숫자만 나열, 명백한 테스트 메시지(예: 'test', '테스트', '123'), 봇/스팸 같은 입력, 의미없는 단어 무한 반복. " +
+                "위로해줘야 할 입력: 고민/감정 표현, 한글 자음모음을 막 친 것(빡치거나 힘들어서 그럴 수 있음), 욕설이나 분노 표현, 짧은 한숨이나 감정 표현. " +
+                "만약 위로가 필요한 상황이라면: 다정하게 위로해주고, 너무 AI 같지 않게 사람답게 말해. " +
+                "유저를 절대 비난하지 말고, 무조건적인 공감과 지지를 보내줘. " +
+                "키보드를 막 친 것 같으면 '많이 힘드셨나봐요' 같은 공감을 표현해줘. " +
+                "핵심 키워드를 욕설 제외하고 3개 정도 뽑아줘. 감정 키워드도 괜찮아. 갯수에 제한받기보다는 정말 중요한 키워드만 뽑아. " +
+                "반드시 JSON 형식으로만 대답해. " +
+                "위로할 때: {\"isValid\": true, \"keyword\": [\"단어1\", \"단어2\"], \"answer\": \"위로 내용\"} " +
+                "거부할 때: {\"isValid\": false, \"keyword\": [], \"answer\": \"\"}";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        GeminiRequest request = GeminiRequest.of(systemPrompt, userContent);
+        GeminiRequest request = GeminiRequest.of(systemPrompt, filteredContent);
         HttpEntity<GeminiRequest> entity = new HttpEntity<>(request, headers);
 
         try {
@@ -59,6 +80,13 @@ public class GeminiService {
                 String cleanedJson = rawContent.replaceAll("(?s)```json|```", "").trim();
                 Map<String, Object> result = objectMapper.readValue(cleanedJson, Map.class);
 
+                // 무의미한 입력인지 확인
+                Object isValidObj = result.get("isValid");
+                boolean isValid = isValidObj instanceof Boolean ? (Boolean) isValidObj : true;
+                if (!isValid) {
+                    throw new CustomException(GeminiErrorCode.GEMINI_INVALID_INPUT);
+                }
+
                 Object keywordObj = result.get("keyword");
                 if (keywordObj instanceof List) {
                     List<String> keywords = (List<String>) keywordObj;
@@ -72,11 +100,16 @@ public class GeminiService {
                     }
                 }
 
+                // isValid 필드 제거 후 반환
+                result.remove("isValid");
                 return result;
             } catch (JsonProcessingException e) {
                 throw new CustomException(GeminiErrorCode.GEMINI_PARSE_ERROR);
             }
 
+        } catch (CustomException e) {
+            // CustomException은 그대로 던지기
+            throw e;
         } catch (HttpClientErrorException.NotFound e) {
             System.err.println("### 404 에러 상세: " + e.getResponseBodyAsString());
             throw new CustomException(GeminiErrorCode.GEMINI_API_ERROR);

@@ -28,7 +28,7 @@ public class RankingController {
     )
     @GetMapping("/top3")
     public ApiResponse<List<Map<String, Object>>> getTop3() {
-        List<Map<String, Object>> result = rankingService.getTop3WithPercentage();
+        List<Map<String, Object>> result = rankingService.getTop3();
         return ApiResponse.onSuccess(result, SuccessCode.OK);
     }
 }
