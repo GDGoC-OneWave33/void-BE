@@ -73,7 +73,6 @@
 - **Framework**: Spring Boot 3.4.2
 - **Language**: Java 17
 - **Build Tool**: Gradle
-- **Database**: H2 (개발)
 - **Cache**: Redis
 
 ### AI & External APIs
@@ -865,4 +864,5 @@ Title: [FEATURE] Add emotion analysis history
 **Made with by Void Team**
 
 </div>
+
 
