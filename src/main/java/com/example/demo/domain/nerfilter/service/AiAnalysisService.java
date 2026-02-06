@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 public class AiAnalysisService {
 
     private final RestTemplate restTemplate;
-    private final String baseUrl = "http://13.209.148.142:80";
+    private final String baseUrl = "https://jyhdevstore.store";
 
     public AiAnalysisService() {
         this.restTemplate = new RestTemplate();
