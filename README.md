@@ -8,7 +8,7 @@
 ![Redis](https://img.shields.io/badge/Redis-latest-DC382D?style=flat&logo=redis)
 
 </div>
----
+
 
 ## 👥 팀원
 - Frontend Developer
@@ -865,3 +865,4 @@ Title: [FEATURE] Add emotion analysis history
 **Made with by Void Team**
 
 </div>
+
